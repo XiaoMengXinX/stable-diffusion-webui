@@ -271,9 +271,11 @@ def train_embedding(embedding_name, learn_rate, batch_size, data_root, log_direc
 
             losses[embedding.step % losses.shape[0]] = loss.item()
 
-            optimizer.zero_grad()
             loss.backward()
-            optimizer.step()
+            if ((i + 1) % gradient_accumulation == 0) or (i + 1 == steps - ititial_step):
+                optimizer.step()
+                optimizer.zero_grad()
+
 
         epoch_num = embedding.step // len(ds)
         epoch_step = embedding.step - (epoch_num * len(ds)) + 1
